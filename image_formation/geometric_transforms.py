@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Read the original image
-image_path = "images/orignal_image.jpg"  # Replace with your image path
+image_path = "images\orignal_image.jpg"  # Replace with your image path
 original_image = cv2.imread(image_path)
 
 # Convert BGR to RGB for displaying with Matplotlib
