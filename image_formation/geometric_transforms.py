@@ -6,64 +6,52 @@ import matplotlib.pyplot as plt
 image_path = "images/original_image.jpg"  # update this path
 original_image = cv2.imread(image_path)
 
-# Check image load
 if original_image is None:
     raise FileNotFoundError("Image not found. Check path!")
 
-# Convert BGR to RGB for displaying with Matplotlib
+# Convert BGR → RGB for matplotlib
 original_rgb = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-
-# --- Perspective Transformation ---
 
 rows, cols = original_image.shape[:2]
 
-# 1. Source points (corners of the original image)
+# --- Perspective Transformation ---
+
+# 1. Source points: corners of original image
 pts1 = np.float32([[0,0], [cols-1,0], [0,rows-1], [cols-1,rows-1]])
 
-# 2. Destination points (adjust numbers to control skew/tilt)
+# 2. Destination points: skew to create the "lean back" effect
 pts2 = np.float32([
-    [100, 50],          # top-left corner
-    [cols-200, 0],      # top-right corner
-    [50, rows-50],      # bottom-left corner
-    [cols-100, rows-100]  # bottom-right corner
+    [100, 0],          # top-left (pulled a bit right)
+    [cols-200, 100],   # top-right (pushed down)
+    [0, rows-1],       # bottom-left stays in place
+    [cols-300, rows-1] # bottom-right pulled left
 ])
 
-# 3. Compute the perspective transform matrix
+# 3. Compute perspective transform
 M = cv2.getPerspectiveTransform(pts1, pts2)
 
-# 4. Apply warpPerspective
-transformed_image = cv2.warpPerspective(original_image, M, (cols, rows))
+# 4. Warp perspective - increase output size for full view
+transformed_image = cv2.warpPerspective(original_image, M, (cols*2, rows*2))
 
 # Convert to RGB for display
 transformed_rgb = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB)
 
-# --- Reverse Engineering the Transform ---
-M_inv = np.linalg.inv(M)  # inverse matrix
-reverse_engineered_image = cv2.warpPerspective(transformed_image, M_inv, (cols, rows))
-reverse_rgb = cv2.cvtColor(reverse_engineered_image, cv2.COLOR_BGR2RGB)
-
 # --- Display ---
-plt.figure(figsize=(15, 5))
+plt.figure(figsize=(10,5))
 
-plt.subplot(1, 3, 1)
+plt.subplot(1,2,1)
 plt.imshow(original_rgb)
 plt.title("Original Image")
 plt.axis("off")
 
-plt.subplot(1, 3, 2)
+plt.subplot(1,2,2)
 plt.imshow(transformed_rgb)
-plt.title("Transformed Image")
-plt.axis("off")
-
-plt.subplot(1, 3, 3)
-plt.imshow(reverse_rgb)
-plt.title("Reverse-Engineered Image")
+plt.title("Transformed Image (Desired Look)")
 plt.axis("off")
 
 plt.tight_layout()
 plt.show()
 
-# --- Print applied transforms ---
 print("Transformations applied:")
-print(f"Perspective warp with points:\nSource: {pts1}\nDestination: {pts2}")
-print("Reverse transformation applied using inverse matrix.")
+print(f"Source points:\n{pts1}")
+print(f"Destination points:\n{pts2}")
