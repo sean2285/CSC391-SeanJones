@@ -7,7 +7,7 @@ import os
 dark_frame_files = [
     "darkframe1.dng",
     "darkframe2.dng",
-    "darkframe3.dng"
+    "darkframe3.dn"
 ]
 
 # Output folder for plots
