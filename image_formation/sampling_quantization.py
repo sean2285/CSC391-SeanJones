@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-signal_freq = 5.0      # Hz
+signal_freq = 5.1     # Hz
 duration = 2           # seconds
 sampling_freq = 8      # Hz
 num_bits = 3           # number of bits (2^3 = 8 levels)
