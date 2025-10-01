@@ -21,7 +21,7 @@ def load_dng_as_rgb(path):
 def compute_region_stats(img, x0, y0, w, h):
     region = img[y0:y0+h, x0:x0+w]
     if region.ndim == 3:
-        region_gray = cv2.cvtColor(region, cv2.COLOR_RGB2GRAY)  # convert to grayscale
+        region_gray = cv2.cvtColor(region, cv2.COLOR_RGB2GRAY)  
     else:
         region_gray = region
     mu = np.mean(region_gray)   
