@@ -17,6 +17,7 @@ def apply_convolution(image, kernel):
             output[y, x] = np.clip(np.sum(region * kernel), 0, 255)
     return output.astype(np.uint8)
 
+
 # Define kernels
 box_filter = (1/9) * np.array([[1,1,1],
                                [1,1,1],
@@ -37,12 +38,25 @@ sharpen_filter = np.array([[ 0, -1,  0],
 # Choose which filter to test
 current_filter = gaussian_filter
 
-# Open webcam
-cap = cv2.VideoCapture(0)
+
+def open_camera(max_index=3):
+    """Try to open one camera at a time (0..max_index)."""
+    for i in range(max_index+1):
+        cap = cv2.VideoCapture(i)
+        if cap.isOpened():
+            print(f"✅ Using camera index {i}")
+            return cap
+        cap.release()
+    raise RuntimeError("❌ No working camera found.")
+
+
+# Open camera
+cap = open_camera()
 
 while True:
     ret, frame = cap.read()
     if not ret:
+        print("⚠️ Frame not captured, exiting...")
         break
 
     # Convert to grayscale
