@@ -44,9 +44,11 @@ def analyze_dark_frame(file_path, patch_size=100):
     plt.xlabel("Pixel Value")
     plt.ylabel("Frequency")
     plt.tight_layout()
+    
+    # Save and show
     out_file = os.path.join(output_dir, f"hist_{os.path.basename(file_path)}.png")
     plt.savefig(out_file)
-    plt.close()
+    plt.show()
 
     return mean_val, std_val
 
@@ -80,6 +82,7 @@ plt.xlabel("Pixel Value")
 plt.ylabel("Frequency")
 plt.legend()
 plt.tight_layout()
-plt.savefig(os.path.join(output_dir, "combined_histograms.png"))
-plt.close()
 
+# Save and show combined histogram
+plt.savefig(os.path.join(output_dir, "combined_histograms.png"))
+plt.show()
