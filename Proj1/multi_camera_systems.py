@@ -33,39 +33,48 @@ def compute_region_stats(img, x0, y0, w, h):
     return mu, sigma
 
 if __name__ == "__main__":
+    # Camera parameters (mm)
     f_main = 24.0
     w_main = 9.8
     f_tele = 77.0
     w_tele = 4.0
 
+    # Calculate horizontal FOVs
     fov_main = horizontal_fov(f_main, w_main)
     fov_tele = horizontal_fov(f_tele, w_tele)
     print(f"Horizontal FOV (main): {fov_main:.2f}°")
     print(f"Horizontal FOV (tele): {fov_tele:.2f}°")
 
-    
-    main_path = "/Users/seanjones/Desktop/maincamera.dng"
-    tele_path = "/Users/seanjones/Desktop/telephotocamera.dng"
+    # Paths to DNG files
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    main_path = os.path.join(base_dir, "maincamera.dng")
+    tele_path = os.path.join(base_dir, "telephotocamera.dng")
 
+    # Load images
     main_img = load_dng_as_rgb(main_path)
     tele_img = load_dng_as_rgb(tele_path)
 
+    # Define ROI (x, y, width, height)
     roi = (100, 100, 50, 50)
 
+    # Compute mean and standard deviation in ROI
     mu_main, sigma_main = compute_region_stats(main_img, *roi)
     mu_tele, sigma_tele = compute_region_stats(tele_img, *roi)
 
     print(f"Main camera (ROI): μ = {mu_main:.2f}, σ = {sigma_main:.2f}")
     print(f"Telephoto camera (ROI): μ = {mu_tele:.2f}, σ = {sigma_tele:.2f}")
 
+    # Draw rectangles on ROI for visualization
     main_disp = main_img.copy()
     tele_disp = tele_img.copy()
     cv2.rectangle(main_disp, (roi[0], roi[1]), (roi[0]+roi[2], roi[1]+roi[3]), (0,255,0), 2)
     cv2.rectangle(tele_disp, (roi[0], roi[1]), (roi[0]+roi[2], roi[1]+roi[3]), (0,255,0), 2)
 
+    # Show images side by side
     fig, axes = plt.subplots(1,2, figsize=(12,6))
     axes[0].imshow(main_disp)
     axes[0].set_title("Main camera ROI")
     axes[1].imshow(tele_disp)
     axes[1].set_title("Telephoto ROI")
     plt.show()
+
