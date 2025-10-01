@@ -43,9 +43,9 @@ if __name__ == "__main__":
     print(f"Horizontal FOV (main): {fov_main:.2f}°")
     print(f"Horizontal FOV (tele): {fov_tele:.2f}°")
 
-    # Update these paths if your .dng files are in another folder
-    main_path = "maincamera.dng"
-    tele_path = "telephotocamera.dng"
+    
+    main_path = "/Users/seanjones/Downloads/maincamera.dng"
+    tele_path = "/Users/seanjones/Downloads/telephotocamera.dng"
 
     main_img = load_dng_as_rgb(main_path)
     tele_img = load_dng_as_rgb(tele_path)
