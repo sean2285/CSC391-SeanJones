@@ -1,165 +1,108 @@
 import cv2
 import numpy as np
 import time
-import sys
 
 
-def apply_convolution(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
-    """Perform convolution manually (no OpenCV filter2D)."""
+def convolve_gray(image, kernel):
+    """Manual convolution for grayscale images."""
     kh, kw = kernel.shape
-    assert kh == kw and kh % 2 == 1, "Kernel must be odd-sized and square"
-    pad = kh // 2
-    x = np.pad(img.astype(np.float32), ((pad, pad), (pad, pad)), mode='edge')
-    H, W = img.shape
-    s0, s1 = x.strides
-    windows = np.lib.stride_tricks.as_strided(
-        x, shape=(H, W, kh, kw), strides=(s0, s1, s0, s1), writeable=False
-    )
-    k = kernel[::-1, ::-1].astype(np.float32)  # flip kernel
-    out = np.tensordot(windows, k, axes=([2, 3], [0, 1]))
-    return np.clip(out, 0, 255).astype(np.uint8)
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image.astype(np.float32),
+                    ((pad_h, pad_h), (pad_w, pad_w)),
+                    mode="edge")
+    h, w = image.shape
+    result = np.zeros((h, w), dtype=np.float32)
+
+    for y in range(h):
+        for x in range(w):
+            roi = padded[y:y+kh, x:x+kw]
+            result[y, x] = np.sum(roi * kernel)
+
+    return np.clip(result, 0, 255).astype(np.uint8)
 
 
-# Define kernels with hotkeys
-KERNELS = {
-    '0: none'     : np.array([[0,0,0],[0,1,0],[0,0,0]], dtype=np.float32),
-    '1: box 3x3'  : (1/9.0) * np.ones((3,3), dtype=np.float32),
-    '2: gaussian' : (1/16.0) * np.array([[1,2,1],[2,4,2],[1,2,1]], dtype=np.float32),
-    '3: sobel X'  : np.array([[-1,-2,-1],[0,0,0],[1,2,1]], dtype=np.float32),
-    '4: sobel Y'  : np.array([[-1,0,1],[-2,0,2],[-1,0,1]], dtype=np.float32),
-    '5: sharpen'  : np.array([[0,-1,0],[-1,5,-1],[0,-1,0]], dtype=np.float32),
-    '6: emboss'   : np.array([[-2,-1,0],[-1,1,1],[0,1,2]], dtype=np.float32),
+FILTERS = {
+    "0": ("None", np.array([[0,0,0],[0,1,0],[0,0,0]], np.float32)),
+    "1": ("Box", (1/9) * np.ones((3,3), np.float32)),
+    "2": ("Gaussian", (1/16) * np.array([[1,2,1],[2,4,2],[1,2,1]], np.float32)),
+    "3": ("Sobel X", np.array([[-1,-2,-1],[0,0,0],[1,2,1]], np.float32)),
+    "4": ("Sobel Y", np.array([[-1,0,1],[-2,0,2],[-1,0,1]], np.float32)),
+    "5": ("Sharpen", np.array([[0,-1,0],[-1,5,-1],[0,-1,0]], np.float32)),
+    "6": ("Emboss", np.array([[-2,-1,0],[-1,1,1],[0,1,2]], np.float32)),
 }
 
 
-def probe_cameras(max_index=4, backend=cv2.CAP_AVFOUNDATION):
-    """Check which cameras are available."""
-    found = []
-    for i in range(max_index + 1):
-        cap = cv2.VideoCapture(i, backend)
-        ok = cap.isOpened()
-        if ok:
-            ok, _ = cap.read()
-        if ok:
-            found.append(i)
-        cap.release()
-    return found
-
-
-def open_camera(index, width=320, height=240, backend=cv2.CAP_AVFOUNDATION):
-    """Open a specific camera safely."""
-    cap = cv2.VideoCapture(index, backend)
-    if not cap.isOpened():
-        cap.release()
-        cap = cv2.VideoCapture(index, cv2.CAP_ANY)
-    if not cap.isOpened():
-        raise RuntimeError(f"Could not open camera {index}")
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+def open_cam(index=0, w=320, h=240):
+    cap = cv2.VideoCapture(index)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, w)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
     cap.set(cv2.CAP_PROP_FPS, 30)
+    if not cap.isOpened():
+        raise RuntimeError(f"❌ Could not open camera {index}")
     return cap
 
 
-def main():
-    print("🔍 Scanning for cameras…")
-    candidates = probe_cameras()
-    if not candidates:
-        print("❌ No camera found. On macOS, check camera permissions in System Settings.")
-        sys.exit(1)
+def run():
+    cam_index = 0
+    cap = open_cam(cam_index)
+    filter_key = "0"
+    filter_name, kernel = FILTERS[filter_key]
 
-    print("✅ Available camera indices:", candidates)
-    try:
-        sel = int(input(f"Pick a camera index from {candidates}: ").strip())
-    except Exception:
-        sel = candidates[0]
-        print(f"Defaulting to {sel}")
+    fps_timer = time.time()
+    frames = 0
+    fps = 0.0
 
-    cap = open_camera(sel, width=424, height=240)
+    print("Press keys 0–6 to change filters | c to switch camera | q to quit")
 
-    choice_key = '0'
-    kernel_name = '0: none'
-    emboss_bias = 128
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            print("⚠️ Camera read failed, retrying...")
+            cap.release()
+            cap = open_cam(cam_index)
+            continue
 
-    window_name = "Webcam (left: original, right: filtered) — keys 0..6, c=cycle, q=quit"
-    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    prev_time, frame_count, fps = time.time(), 0, 0.0
+        if filter_key == "0":
+            processed = gray
+        else:
+            processed = convolve_gray(gray, kernel)
+            if filter_key == "6":  # Emboss
+                processed = np.clip(processed.astype(np.int16) + 128, 0, 255).astype(np.uint8)
 
-    print("\nHotkeys: 0..6 = switch filters | c = cycle cameras | q/ESC = quit")
-    print("Filters:", ", ".join(KERNELS.keys()))
+        stacked = np.vstack((gray, processed))  # show one above the other
 
-    cam_list = candidates
-    cam_idx_in_list = cam_list.index(sel) if sel in cam_list else 0
+        # FPS counter
+        frames += 1
+        now = time.time()
+        if now - fps_timer >= 1.0:
+            fps = frames / (now - fps_timer)
+            fps_timer, frames = now, 0
 
-    try:
-        while True:
-            ok, frame = cap.read()
-            if not ok:
-                print("⚠️ Frame grab failed; retrying…")
-                cap.release()
-                cap = open_camera(cam_list[cam_idx_in_list])
-                continue
+        # Overlay FPS
+        cv2.putText(stacked, f"FPS: {fps:.1f}", (10, 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, 255, 1, cv2.LINE_AA)
 
-            # Original
-            color_left = frame
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        cv2.imshow("Grayscale (top) vs Filtered (bottom)", stacked)
 
-            # Apply filter
-            if choice_key == '0':
-                filtered_gray = gray
-            else:
-                kernel_name = [k for k in KERNELS if k.startswith(choice_key)][0]
-                ker = KERNELS[kernel_name]
-                filtered_gray = apply_convolution(gray, ker)
-                if choice_key == '6':  # emboss special case
-                    filtered_gray = np.clip(filtered_gray.astype(np.int16) + emboss_bias, 0, 255).astype(np.uint8)
+        key = cv2.waitKey(1) & 0xFF
 
-            filtered_bgr = cv2.cvtColor(filtered_gray, cv2.COLOR_GRAY2BGR)
+        if key in (ord("q"), 27):
+            break
+        if ord("0") <= key <= ord("6"):
+            filter_key = chr(key)
+            filter_name, kernel = FILTERS[filter_key]
+            print(f"➡️ Switched to filter: {filter_name}")
+        if key == ord("c"):
+            cam_index = (cam_index + 1) % 3  # try 0,1,2
+            cap.release()
+            cap = open_cam(cam_index)
+            print(f"🔄 Switched to camera {cam_index}")
 
-            # Side-by-side view
-            both = np.hstack((color_left, filtered_bgr))
-
-            # FPS calc
-            frame_count += 1
-            now = time.time()
-            if now - prev_time >= 0.5:
-                fps = frame_count / (now - prev_time)
-                prev_time, frame_count = now, 0
-
-            # Overlay text
-            overlay = both.copy()
-            cv2.putText(overlay, f"Filter: {kernel_name}", (10, 20),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 1, cv2.LINE_AA)
-            cv2.putText(overlay, f"FPS: {fps:.1f}", (10, 42),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 1, cv2.LINE_AA)
-
-            cv2.imshow(window_name, overlay)
-            key = cv2.waitKey(1) & 0xFF
-
-            # Quit
-            if key in (ord('q'), 27):
-                break
-
-            # Filter switch
-            if ord('0') <= key <= ord('6'):
-                choice_key = chr(key)
-                kernel_name = [k for k in KERNELS if k.startswith(choice_key)][0]
-
-            # Camera cycle
-            if key == ord('c'):
-                cam_idx_in_list = (cam_idx_in_list + 1) % len(cam_list)
-                cap.release()
-                cap = open_camera(cam_list[cam_idx_in_list], width=424, height=240)
-                print(f"🔄 Switched to camera index {cam_list[cam_idx_in_list]}")
-
-            # Window closed manually
-            if cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE) < 1:
-                break
-
-    finally:
-        cap.release()
-        cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
-    main()
+    run()
