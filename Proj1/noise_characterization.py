@@ -26,12 +26,12 @@ for f in dark_frame_files:
     else:
         print(f"File not found: {f}")
 
-# Plot one combined histogram
+# Histogram of all patches combined
 plt.figure(figsize=(7,5))
 for name, patch_data in patches:
     plt.hist(patch_data, bins=60, alpha=0.5, label=name)
 
-plt.title("Combined Histogram of Dark Frames")
+plt.title("Histogram of Dark Frames")
 plt.xlabel("Pixel Value")
 plt.ylabel("Frequency")
 plt.legend()
