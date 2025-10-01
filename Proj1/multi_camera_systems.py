@@ -44,8 +44,8 @@ if __name__ == "__main__":
     print(f"Horizontal FOV (tele): {fov_tele:.2f}°")
 
     
-    main_path = "/Users/seanjones/Downloads/maincamera.dng"
-    tele_path = "/Users/seanjones/Downloads/telephotocamera.dng"
+    main_path = "/Users/seanjones/Desktop/maincamera.dng"
+    tele_path = "/Users/seanjones/Desktop/telephotocamera.dng"
 
     main_img = load_dng_as_rgb(main_path)
     tele_img = load_dng_as_rgb(tele_path)
