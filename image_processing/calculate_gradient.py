@@ -21,4 +21,7 @@ def calculate_gradient(img):
     grad_magnitude = np.sqrt(Gx**2 + Gy**2)
     grad_magnitude = np.clip(grad_magnitude, 0, 255).astype(np.uint8)
 
+    grad_angle = np.arctan2(Gy, Gx) * (180.0 / np.pi)
+    grad_angle = np.mod(grad_angle, 180)  # keep angle in [0,180)
+
     return grad_magnitude
