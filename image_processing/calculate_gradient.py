@@ -1,27 +1,21 @@
 import cv2
 import numpy as np
-from apply_convolution import apply_convolution
 
 def calculate_gradient(img):
-   
-    # Define Sobel kernels
+    # Sobel filters
     Sx = np.array([[-1, 0, 1],
                    [-2, 0, 2],
                    [-1, 0, 1]], dtype=np.float32)
-
     Sy = np.array([[-1, -2, -1],
                    [ 0,  0,  0],
                    [ 1,  2,  1]], dtype=np.float32)
 
-    # Apply Sobel filters
-    Gx = apply_convolution(img, Sx)
-    Gy = apply_convolution(img, Sy)
+    # Apply convolution directly using OpenCV
+    gx = cv2.filter2D(img, cv2.CV_32F, Sx)
+    gy = cv2.filter2D(img, cv2.CV_32F, Sy)
 
-    # Compute gradient magnitude
-    grad_magnitude = np.sqrt(Gx**2 + Gy**2)
-    grad_magnitude = np.clip(grad_magnitude, 0, 255).astype(np.uint8)
-
-    grad_angle = np.arctan2(Gy, Gx) * (180.0 / np.pi)
-    grad_angle = np.mod(grad_angle, 180)  # keep angle in [0,180)
-
-    return grad_magnitude
+    # Gradient magnitude
+    grad_mag = np.sqrt(gx**2 + gy**2)
+    grad_mag = np.clip(grad_mag, 0, 255).astype(np.uint8)
+    
+    return grad_mag
