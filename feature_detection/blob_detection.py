@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 #Load image and covert it
-image = cv2.imread("images/example-image.jpg")
+image = cv2.imread("feature_detection/images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 #Initialize SIFT detector
