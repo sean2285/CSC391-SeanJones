@@ -22,6 +22,8 @@ print(f"nOctaveLayers: {sift.getNOctaveLayers()}")
 
 #Find keypoints
 keypoints, descriptors = sift.detectAndCompute(gray, None)
+print(f"\nTotal keypoints: {len(keypoints)}")
+print(f"Descriptor shape: {descriptors.shape}")
 
 #Display information about the first few keypoints
 for i, kp in enumerate(keypoints[:5]):
@@ -32,12 +34,23 @@ for i, kp in enumerate(keypoints[:5]):
     print(f" - Response: {kp.response}")
     print(f" - Octave: {kp.octave}")
 
-#Draw keypoints with their scales
-output_image = cv2.drawKeypoints(
-    image, keypoints, None,
-    flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
-)
+#One randomly selected keypoint
+selected_kp = keypoints[7]
+descriptor = descriptors[7]
+x, y = np.int32(selected_kp.pt)
+size = int(selected_kp.size)
 
-cv2.imshow("SIFT Keypoints", output_image)
+# Draw keypoint and surrounding region
+output_image = image.copy()
+cv2.circle(output_image, (x, y), size, (0, 255, 0), 2)
+cv2.rectangle(output_image, (x - size, y - size), (x + size, y + size), (255, 0, 0), 1)
+cv2.imshow("SIFT Keypoint with Selected Region", output_image)
+
+#Wait for user to close window
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+#Print the descriptor of the selected keypoint
+print(descriptor)
+
+visualize_descriptor(descriptor)
