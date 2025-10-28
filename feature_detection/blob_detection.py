@@ -5,18 +5,12 @@ import numpy as np
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-#Initialize SIFT detector
-sift = cv2.SIFT_create()
-
-#Find keypoints
-keypoints = sift.detect(gray, None)
-
-#Re-initialize SIFT with tuned parameters
+#Initizalize SIFT with custom parameters
 sift = cv2.SIFT_create(
-    contrastThreshold=10,   
-    edgeThreshold=20,        
-    sigma=2.6,               
-    nOctaveLayers=8          
+    contrastThreshold=0.02,   
+    edgeThreshold=5,        
+    sigma=1.6,               
+    nOctaveLayers=4         
 )
 
 #Tunable parameters
@@ -25,6 +19,9 @@ print(f"contrastThreshold: {sift.getContrastThreshold()}")
 print(f"edgeThreshold: {sift.getEdgeThreshold()}")
 print(f"sigma: {sift.getSigma()}")
 print(f"nOctaveLayers: {sift.getNOctaveLayers()}")
+
+#Find keypoints
+keypoints, descriptors = sift.detectANDCompute(gray, None)
 
 #Display information about the first few keypoints
 for i, kp in enumerate(keypoints[:5]):
