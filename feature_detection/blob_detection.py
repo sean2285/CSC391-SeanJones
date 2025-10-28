@@ -5,7 +5,7 @@ import numpy as np
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-#Initizalize SIFT with custom parameters
+#Initizalize SIFT with custom parameters (values altered for best appearing results)
 sift = cv2.SIFT_create(
     contrastThreshold=0.0225,   
     edgeThreshold=2.5,        
