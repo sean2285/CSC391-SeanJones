@@ -46,7 +46,7 @@ output_image = cv2.drawKeypoints(
     flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
 )
 
-#Highlight one keypoint for observation
+#Highlight one keypoint for observation (blue rectangle surrounding the point)
 cv2.circle(output_image, (x, y), size, (0, 255, 0), 2)
 cv2.rectangle(output_image, (x - size, y - size), (x + size, y + size), (255, 0, 0), 1)
 
