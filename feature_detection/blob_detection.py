@@ -21,7 +21,7 @@ print(f"sigma: {sift.getSigma()}")
 print(f"nOctaveLayers: {sift.getNOctaveLayers()}")
 
 #Find keypoints
-keypoints, descriptors = sift.detectANDCompute(gray, None)
+keypoints, descriptors = sift.detectAndCompute(gray, None)
 
 #Display information about the first few keypoints
 for i, kp in enumerate(keypoints[:5]):
