@@ -7,7 +7,7 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 #Initizalize SIFT with custom parameters (values altered for best appearing results)
 sift = cv2.SIFT_create(
-    contrastThreshold=0.15,   
+    contrastThreshold=0.1,   
     edgeThreshold=3,        
     sigma=2,               
     nOctaveLayers=4         
