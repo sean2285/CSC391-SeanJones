@@ -8,15 +8,15 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 #Initialize SIFT detector
 sift = cv2.SIFT_create()
 
+#Find keypoints
+keypoints = sift.detect(gray, None)
+
 #Tunable parameters
 print("SIFT Parameters:")
 print(f"contrastThreshold: {sift.getContrastThreshold()}")
 print(f"edgeThreshold: {sift.getEdgeThreshold()}")
 print(f"sigma: {sift.getSigma()}")
 print(f"nOctaveLayers: {sift.getNOctaveLayers()}")
-
-#Find keypoints
-keypoints = sift.detect(gray, None)
 
 #Display information about the first few keypoints
 for i, kp in enumerate(keypoints[:5]):
