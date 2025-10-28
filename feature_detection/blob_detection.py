@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-#Load image and covert it
+#Load image and covert it to grayscale
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
