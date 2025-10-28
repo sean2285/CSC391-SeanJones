@@ -11,6 +11,14 @@ sift = cv2.SIFT_create()
 #Find keypoints
 keypoints = sift.detect(gray, None)
 
+#Re-initialize SIFT with tuned parameters
+sift = cv2.SIFT_create(
+    contrastThreshold=0.02,   
+    edgeThreshold=10,        
+    sigma=1.6,               
+    nOctaveLayers=4          
+)
+
 #Tunable parameters
 print("SIFT Parameters:")
 print(f"contrastThreshold: {sift.getContrastThreshold()}")
