@@ -35,8 +35,8 @@ for i, kp in enumerate(keypoints[:5]):
     print(f" - Octave: {kp.octave}")
 
 #One randomly selected keypoint
-selected_kp = keypoints[7]
-descriptor = descriptors[7]
+selected_kp = keypoints[15]
+descriptor = descriptors[15]
 x, y = np.int32(selected_kp.pt)
 size = int(selected_kp.size)
 
