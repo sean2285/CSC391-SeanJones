@@ -10,7 +10,7 @@ sift = cv2.SIFT_create(
     contrastThreshold=0.075,   
     edgeThreshold=2.5,        
     sigma=3,               
-    nOctaveLayers=5         
+    nOctaveLayers=4         
 )
 
 #Tunable parameters
