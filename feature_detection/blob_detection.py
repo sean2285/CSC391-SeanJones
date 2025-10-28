@@ -5,6 +5,10 @@ import numpy as np
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+#Load transfmored image and covert it to grayscale
+image2 = cv2.imread("images/example-image-transformed.jpg")
+gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+
 #Initizalize SIFT with custom parameters (values altered for best appearing results)
 sift = cv2.SIFT_create(
     contrastThreshold=0.075,   
@@ -57,5 +61,30 @@ cv2.destroyAllWindows()
 #Print the descriptor of the selected keypoint
 print(descriptor)
 
+#Compute keypoints and descriptors for the transformed image
+keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+print(f"Total keypoints (image2): {len(keypoints2)}")
+print(f"Descriptor shape (image2): {descriptors2.shape}")
 
+#Initialize Brute-Force Matcher
+bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+
+#Match descriptors between image and image2
+matches = bf.match(descriptors, descriptors2)
+
+#Sort matches by distance
+matches = sorted(matches, key=lambda x: x.distance)
+
+#Top 50 matches
+matched_img = cv2.drawMatches(
+    image, keypoints,
+    image2, keypoints2,
+    matches[:50], None,
+    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
+)
+
+# Display the matched keypoints
+cv2.imshow("Top 50 SIFT Feature Matches", matched_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
