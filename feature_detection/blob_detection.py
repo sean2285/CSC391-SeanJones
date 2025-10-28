@@ -5,6 +5,8 @@ import numpy as np
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+gray_enhanced = cv2.equalizeHist(gray)
+
 #Initizalize SIFT with custom parameters
 sift = cv2.SIFT_create(
     contrastThreshold=0.02,   
