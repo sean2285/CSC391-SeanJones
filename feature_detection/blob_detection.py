@@ -57,4 +57,3 @@ cv2.destroyAllWindows()
 #Print the descriptor of the selected keypoint
 print(descriptor)
 
-visualize_descriptor(descriptor)
