@@ -13,7 +13,7 @@ keypoints = sift.detect(gray, None)
 
 #Re-initialize SIFT with tuned parameters
 sift = cv2.SIFT_create(
-    contrastThreshold=0.10,   
+    contrastThreshold=10,   
     edgeThreshold=20,        
     sigma=2.6,               
     nOctaveLayers=8          
