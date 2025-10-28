@@ -40,13 +40,17 @@ descriptor = descriptors[7]
 x, y = np.int32(selected_kp.pt)
 size = int(selected_kp.size)
 
-# Draw keypoint and surrounding region
-output_image = image.copy()
+#Plot all keypoints
+output_image = cv2.drawKeypoints(
+    image, keypoints, None,
+    flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
+)
+
+#Highlight one keypoint for observation
 cv2.circle(output_image, (x, y), size, (0, 255, 0), 2)
 cv2.rectangle(output_image, (x - size, y - size), (x + size, y + size), (255, 0, 0), 1)
-cv2.imshow("SIFT Keypoint with Selected Region", output_image)
 
-#Wait for user to close window
+cv2.imshow("SIFT Keypoints + Selected Region", output_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
