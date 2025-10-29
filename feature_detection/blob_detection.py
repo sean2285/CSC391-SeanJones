@@ -11,9 +11,9 @@ if not os.path.exists(transformed_path):
     rows, cols = image.shape[:2]
     M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 30, 1.2)
     transformed = cv2.warpAffine(image, M, (cols, rows))
-    
-#Save transformed image
-cv2.imwrite(transformed_path, transformed)
+    cv2.imwrite(transformed_path, transformed)
+else:
+    exit()
 
 #Load transfmored image and covert it to grayscale
 image2 = cv2.imread("images/example-image-transformed.jpg")
