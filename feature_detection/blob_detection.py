@@ -13,7 +13,7 @@ if not os.path.exists(transformed_path):
     transformed = cv2.warpAffine(image, M, (cols, rows))
     cv2.imwrite(transformed_path, transformed)
 else:
-    exit()
+    pass
 
 #Load transfmored image and covert it to grayscale
 image2 = cv2.imread("images/example-image-transformed.jpg")
