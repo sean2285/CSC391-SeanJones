@@ -1,9 +1,20 @@
 import cv2
 import numpy as np
+import os
 
 #Load image and covert it to grayscale
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+transformed_path = "images/example-image-transformed.jpg"
+if not os.path.exists(transformed_path):
+    print("Transformed image not found — creating one automatically...")
+    rows, cols = image.shape[:2
+M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 30, 1.2)
+transformed = cv2.warpAffine(image, M, (cols, rows))
+
+#Save transformed image
+cv2.imwrite(transformed_path, transformed)
 
 #Load transfmored image and covert it to grayscale
 image2 = cv2.imread("images/example-image-transformed.jpg")
