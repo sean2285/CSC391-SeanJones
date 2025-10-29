@@ -1,12 +1,26 @@
 import cv2
 import numpy as np
+import os 
 
 #Load image and covert it to grayscale
 image = cv2.imread("images/example-image.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-#Load transfmored image and covert it to grayscale
-image2 = cv2.imread("images/example-image-transformed.jpg")
+#Apply transformations to create a second image
+rows, cols = gray.shape
+M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 30, 1.2)
+transformed = cv2.warpAffine(image, M, (cols, rows))
+
+tx, ty = 30, 20
+translation_matrix = np.float32([[1, 0, tx], [0, 1, ty]])
+transformed = cv2.warpAffine(transformed, translation_matrix, (cols, rows))
+
+#Save new image
+os.makedirs("images", exist_ok=True)
+transformed_path = "images/example-image-transformed.jpg"
+cv2.imwrite(transformed_path, transformed)
+
+image2 = cv2.imread(transformed_path)
 gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
 
 #Initizalize SIFT with custom parameters (values altered for best appearing results)
