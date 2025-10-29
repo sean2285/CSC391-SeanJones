@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import os
 
 #Load image and covert it to grayscale
 image = cv2.imread("images/example-image.jpg")
@@ -27,17 +26,31 @@ print(f"nOctaveLayers: {sift.getNOctaveLayers()}")
 
 #Find keypoints
 keypoints, descriptors = sift.detectAndCompute(gray, None)
-print(f"\nTotal keypoints: {len(keypoints)}")
-print(f"Descriptor shape: {descriptors.shape}")
+keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
 
-#Display information about the first few keypoints
-for i, kp in enumerate(keypoints[:5]):
-    print(f"Keypoint {i+1}:")
-    print(f" - Coordinates: {kp.pt}")
-    print(f" - Scale (size): {kp.size}")
-    print(f" - Orientation (angle): {kp.angle}")
-    print(f" - Response: {kp.response}")
-    print(f" - Octave: {kp.octave}")
+#Print information
+print(f"\nOriginal Image Total keypoints: {len(keypoints)}")
+print(f"Original Image Descriptor shape: {descriptors.shape}")
+print(f"Transformed Image Total keypoints: {len(keypoints2)}")
+print(f"Transformed Image Descriptor shape): {descriptors2.shape}")
+
+#Utilize Brute-Force Matcher
+bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+matches = bf.match(descriptors, descriptors2)
+matches = sorted(matches, key=lambda x: x.distance)
+
+#Draw top 50 matches
+matched_img = cv2.drawMatches(
+    image, keypoints,
+    image2, keypoints2,
+    matches[:50], None,
+    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
+)
+
+#Display results
+cv2.imshow("Top 50 SIFT Feature Matches", matched_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 #One randomly selected keypoint
 selected_kp = keypoints[22]
@@ -61,31 +74,3 @@ cv2.destroyAllWindows()
 
 #Print the descriptor of the selected keypoint
 print(descriptor)
-
-#Compute keypoints and descriptors for the transformed image
-keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
-print(f"Total keypoints (image2): {len(keypoints2)}")
-print(f"Descriptor shape (image2): {descriptors2.shape}")
-
-#Initialize Brute-Force Matcher
-bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-
-#Match descriptors between image and image2
-matches = bf.match(descriptors, descriptors2)
-
-#Sort matches by distance
-matches = sorted(matches, key=lambda x: x.distance)
-
-#Top 50 matches
-matched_img = cv2.drawMatches(
-    image, keypoints,
-    image2, keypoints2,
-    matches[:50], None,
-    flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
-)
-
-# Display the matched keypoints
-cv2.imshow("Top 50 SIFT Feature Matches", matched_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
