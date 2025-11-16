@@ -51,7 +51,7 @@ for fname in images:
 
 cv2.destroyAllWindows()
 
-# --- CAMERA CALIBRATION ---
+# Camera calibration
 print("\n🔧 Running camera calibration...")
 
 ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
@@ -64,11 +64,11 @@ print("\nCamera Matrix (K):\n", K)
 print("\nDistortion Coefficients:\n", dist)
 print("\nNumber of views used:", len(objpoints))
 
-#Save calibration results
+# Save calibration results
 np.save("camera_matrix.npy", K)
 np.save("dist_coeffs.npy", dist)
 
-#Undistort a sample image
+# Undistort a sample image
 sample_img = cv2.imread(images[0])
 h, w = sample_img.shape[:2]
 
