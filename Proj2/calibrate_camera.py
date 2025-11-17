@@ -68,3 +68,6 @@ new_cam, roi = cv2.getOptimalNewCameraMatrix(K, dist, (w, h), 1)
 undistorted = cv2.undistort(sample_img, K, dist, None, new_cam)
 cv2.imwrite("undistorted_preview.png", undistorted)
 
+cv2.imshow("Undistorted Preview", undistorted)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
