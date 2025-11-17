@@ -66,8 +66,10 @@ sample_img = cv2.imread(images[0])
 h, w = sample_img.shape[:2]
 new_cam, roi = cv2.getOptimalNewCameraMatrix(K, dist, (w, h), 1)
 undistorted = cv2.undistort(sample_img, K, dist, None, new_cam)
-cv2.imwrite("undistorted_preview.png", undistorted)
+comparison = np.hstack((sample_img, undistorted))
 
-cv2.imshow("Undistorted Preview", undistorted)
+cv2.imwrite("comparison_distorted_vs_undistorted.png", comparison)
+
+cv2.imshow("Distorted (Left) vs Undistorted (Right)", comparison)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
