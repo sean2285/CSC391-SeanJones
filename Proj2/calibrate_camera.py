@@ -46,9 +46,7 @@ for fname in images:
 
         #Previdew detected corners
         cv2.drawChessboardCorners(img, CHECKERBOARD, corners_refined, ret)
-        cv2.imshow("Corners", img)
-        cv2.waitKey(200)
-
+        
 cv2.destroyAllWindows()
 
 # Camera calibration
@@ -77,7 +75,4 @@ new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K, dist, (w, h), 1)
 
 undistorted = cv2.undistort(sample_img, K, dist, None, new_camera_matrix)
 
-cv2.imshow("Original", sample_img)
-cv2.imshow("Undistorted", undistorted)
-cv2.waitKey(0)
 cv2.destroyAllWindows()
