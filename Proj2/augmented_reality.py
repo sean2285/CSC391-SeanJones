@@ -70,4 +70,4 @@ def draw_cube(image, pts):
 output = draw_cube(img, imgpts)
 
 cv2.imwrite("AR_result.png", output)
-print("\nSaved AR_result.png")
+
