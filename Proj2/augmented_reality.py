@@ -71,3 +71,6 @@ output = draw_cube(img, imgpts)
 
 cv2.imwrite("AR_result.png", output)
 
+cv2.imshow("AR Cube Result", output)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
