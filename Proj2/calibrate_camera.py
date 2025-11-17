@@ -68,4 +68,3 @@ new_cam, roi = cv2.getOptimalNewCameraMatrix(K, dist, (w, h), 1)
 undistorted = cv2.undistort(sample_img, K, dist, None, new_cam)
 cv2.imwrite("undistorted_preview.png", undistorted)
 
-print("Save undistored preview")
